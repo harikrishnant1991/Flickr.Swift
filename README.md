@@ -2,7 +2,7 @@
 
 This is a library written entirely in swift for working with Flickr OAuth APIs.
 
-### Important Notes:
+#### Important Notes:
 1. The Flickr API requires an HMAC-SHA1 signature. For this purpose, you need to create a Bridging Header file for objective-C(in case you already don't have one) and do the following import in that:
 ```swift
 #import <CommonCrypto/CommonHMAC.h>
@@ -10,7 +10,6 @@ This is a library written entirely in swift for working with Flickr OAuth APIs.
 2. The redirect URL set in the Flickr Developer console need to have a custom URL Scheme unique to your application and it must be registered in the `plist` file.
 
 ## How to use
----
 The Flickr API authentication and calls are controlled using a single instance of the singleton class `JHFlickr`, which can be accessed using:
 
 ```swift
@@ -27,7 +26,7 @@ func application(application: UIApplication, didFinishLaunchingWithOptions launc
 
 This will initialise the Flickr Session with your Consumer Key, Consumer Secret and Redirect URL. The last parameter is the access level required by the App. This can be `Read`, `Write` or `Delete` as per your requirements.
 
-### User Authentication
+#### User Authentication
 
 The user authentication can be verified using this call to determine if an active and valid session already exists before starting a new authentication flow.
 
