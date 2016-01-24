@@ -54,12 +54,36 @@
 		466F5B121C547D6C002D3051 /* Flickr */ = {
 			isa = PBXGroup;
 			children = (
-				466F5B131C547D6C002D3051 /* AppDelegate.swift */,
-				466F5B151C547D6C002D3051 /* ViewController.swift */,
+				466F5B271C547E32002D3051 /* Flickr */,
+				466F5B251C547D9C002D3051 /* Demo */,
 				466F5B171C547D6C002D3051 /* Main.storyboard */,
 				466F5B1A1C547D6C002D3051 /* Assets.xcassets */,
 				466F5B1C1C547D6C002D3051 /* LaunchScreen.storyboard */,
 				466F5B1F1C547D6C002D3051 /* Info.plist */,
+			);
+			path = Flickr;
+			sourceTree = "<group>";
+		};
+		466F5B251C547D9C002D3051 /* Demo */ = {
+			isa = PBXGroup;
+			children = (
+				466F5B131C547D6C002D3051 /* AppDelegate.swift */,
+				466F5B261C547DC3002D3051 /* viewcontrollers */,
+			);
+			path = Demo;
+			sourceTree = "<group>";
+		};
+		466F5B261C547DC3002D3051 /* viewcontrollers */ = {
+			isa = PBXGroup;
+			children = (
+				466F5B151C547D6C002D3051 /* ViewController.swift */,
+			);
+			path = viewcontrollers;
+			sourceTree = "<group>";
+		};
+		466F5B271C547E32002D3051 /* Flickr */ = {
+			isa = PBXGroup;
+			children = (
 			);
 			path = Flickr;
 			sourceTree = "<group>";
@@ -90,6 +114,7 @@
 		466F5B081C547D6C002D3051 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				CLASSPREFIX = JH;
 				LastSwiftUpdateCheck = 0720;
 				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = "FyrWeel Infolabz";
