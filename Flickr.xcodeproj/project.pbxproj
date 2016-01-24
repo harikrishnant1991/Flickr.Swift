@@ -12,6 +12,9 @@
 		466F5B191C547D6C002D3051 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 466F5B171C547D6C002D3051 /* Main.storyboard */; };
 		466F5B1B1C547D6C002D3051 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 466F5B1A1C547D6C002D3051 /* Assets.xcassets */; };
 		466F5B1E1C547D6C002D3051 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 466F5B1C1C547D6C002D3051 /* LaunchScreen.storyboard */; };
+		466F5B291C548FB5002D3051 /* JHFlickr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466F5B281C548FB5002D3051 /* JHFlickr.swift */; };
+		466F5B2C1C549F7D002D3051 /* JHFlickrOAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466F5B2B1C549F7D002D3051 /* JHFlickrOAuth.swift */; };
+		466F5B2F1C54AE77002D3051 /* JHUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466F5B2E1C54AE77002D3051 /* JHUtils.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +25,10 @@
 		466F5B1A1C547D6C002D3051 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		466F5B1D1C547D6C002D3051 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		466F5B1F1C547D6C002D3051 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		466F5B281C548FB5002D3051 /* JHFlickr.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JHFlickr.swift; sourceTree = "<group>"; };
+		466F5B2B1C549F7D002D3051 /* JHFlickrOAuth.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JHFlickrOAuth.swift; sourceTree = "<group>"; };
+		466F5B2E1C54AE77002D3051 /* JHUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JHUtils.swift; sourceTree = "<group>"; };
+		466F5B301C54B02F002D3051 /* Flickr-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Flickr-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,8 +91,28 @@
 		466F5B271C547E32002D3051 /* Flickr */ = {
 			isa = PBXGroup;
 			children = (
+				466F5B281C548FB5002D3051 /* JHFlickr.swift */,
+				466F5B2D1C54AE4D002D3051 /* utils */,
+				466F5B2A1C549F4A002D3051 /* OAuth */,
+				466F5B301C54B02F002D3051 /* Flickr-Bridging-Header.h */,
 			);
 			path = Flickr;
+			sourceTree = "<group>";
+		};
+		466F5B2A1C549F4A002D3051 /* OAuth */ = {
+			isa = PBXGroup;
+			children = (
+				466F5B2B1C549F7D002D3051 /* JHFlickrOAuth.swift */,
+			);
+			path = OAuth;
+			sourceTree = "<group>";
+		};
+		466F5B2D1C54AE4D002D3051 /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				466F5B2E1C54AE77002D3051 /* JHUtils.swift */,
+			);
+			path = utils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -160,8 +187,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				466F5B2C1C549F7D002D3051 /* JHFlickrOAuth.swift in Sources */,
+				466F5B291C548FB5002D3051 /* JHFlickr.swift in Sources */,
 				466F5B161C547D6C002D3051 /* ViewController.swift in Sources */,
 				466F5B141C547D6C002D3051 /* AppDelegate.swift in Sources */,
+				466F5B2F1C54AE77002D3051 /* JHUtils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -274,10 +304,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = Flickr/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.fyrweel.Flickr;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Flickr/Flickr/Flickr-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
@@ -285,10 +318,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = Flickr/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.fyrweel.Flickr;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Flickr/Flickr/Flickr-Bridging-Header.h";
 			};
 			name = Release;
 		};
