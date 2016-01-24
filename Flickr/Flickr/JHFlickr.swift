@@ -37,8 +37,8 @@ class JHFlickr: NSObject {
     
     // MARK: Static variables
     /**
-     The singleton instance of the JHFlickr library. This instance is required to access the entire functionality of the library.
-     */
+    The singleton instance of the JHFlickr library. This instance is required to access the entire functionality of the library.
+    */
     static let Session = JHFlickr()
     
     // MARK: Public Properties
@@ -49,18 +49,19 @@ class JHFlickr: NSObject {
     var oAuthDelegate : JHFlickrAuthenticationDelegate?
     
     /**
-    The instance of JHFlickrOAuth that handles the OAuth flow of JHFlickr library.
-    */
+     The instance of JHFlickrOAuth that handles the OAuth flow of JHFlickr library.
+     */
     var oAuth : JHFlickrOAuth?
     
     // MARK: Public methods
     /**
-     Initialize the flickr session with consumer key and consumer secret obtained from developer console and redirect URL set in the developer console.
-     
-     - parameter consumerKey: The consumer key obtained when creating an app in Flickr developer console.
-     - parameter consumerSecret: The consumer secret obtained when creating an app in Flickr developer console.
-     - parameter redirectURL: The redirect URL set when the app is created in the Flickr developer console.
-     */
+    Initialize the flickr session with consumer key and consumer secret obtained from developer console and redirect URL set in the developer console.
+    
+    - parameter consumerKey: The consumer key obtained when creating an app in Flickr developer console.
+    - parameter consumerSecret: The consumer secret obtained when creating an app in Flickr developer console.
+    - parameter redirectURL: The redirect URL set when the app is created in the Flickr developer console.
+    - parameter accessLevel: The access level for the API calls.
+    */
     func initialize(consumerKey consumerKey : String, consumerSecret : String, redirectURL : NSURL, accessLevel : AccessLevel) {
         JHUtils.CONSUMER_KEY = consumerKey
         JHUtils.CONSUMER_SECRET = consumerSecret
@@ -69,11 +70,39 @@ class JHFlickr: NSObject {
     }
     
     /**
+     Check if JHFlickr has an active session with a valid access token.
+     
+     - parameter completionHandler: The completion handler for the verification call. Passes a boolean parameter to show the accesstoken status.
+     */
+    func checkFlickrStatus(onCompletion completionHandler: (status : Bool) -> Void) {
+        if accessToken == nil || accessToken == "" || accessSecret == nil || accessSecret == "" || userNSID == nil || userNSID == "" {
+            completionHandler(status: true)
+            return
+        }
+        oAuth = JHFlickrOAuth()
+        oAuth?.verifyAccessToken(accessToken, accessSecret: accessSecret, completionHandler: { (status) -> Void in
+            completionHandler(status: status)
+        })
+    }
+    
+    /**
      Start the OAuth flow of flickr.
+     
+     It is adivasble always to check for active sessions before starting a new OAuth flow as shown below:
+     ```
+     JHFlickr.Session.checkFlickrStatus(onCompletion: { (status) -> Void in
+        if !status {
+            JHFlickr.Session.oAuthDelegate = self
+            JHFlickr.Session.startAuthentication()
+        }
+     })
+     ```
      */
     func startAuthentication() {
-        oAuth = JHFlickrOAuth()
-        oAuth?.initializeOAuth(redirectURL.absoluteString, accessLevel: accessLevel, completionHandler: { (status, accessToken, accessSecret, userNSID, error) -> Void in
+        if oAuth == nil {
+            oAuth = JHFlickrOAuth()
+        }
+        oAuth?.initializeOAuth(redirectURL: redirectURL.absoluteString, accessLevel: accessLevel, completionHandler: { (status, accessToken, accessSecret, userNSID, error) -> Void in
             //Completion handler of Flickr OAuth
             if status {
                 self.accessToken = accessToken
@@ -84,14 +113,15 @@ class JHFlickr: NSObject {
             else {
                 self.oAuthDelegate?.authenticationFailed(error!)
             }
+            self.oAuth = nil
         })
     }
     
     // MARK: Private Properties
     
     /**
-     The redirect URL set when the app is created in the Flickr developer console.
-     */
+    The redirect URL set when the app is created in the Flickr developer console.
+    */
     private var redirectURL : NSURL!
     
     /**

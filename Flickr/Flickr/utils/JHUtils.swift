@@ -25,6 +25,8 @@ extension String {
 
 class JHUtils: NSObject {
     
+    static let FLICKR_BASE_URL = "https://api.flickr.com/services/rest"
+    
     /**
      The consumer key obtained from Flickr developer console.
      */

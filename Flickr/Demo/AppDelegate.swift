@@ -16,6 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        JHFlickr.Session.initialize(consumerKey: "[YOUR_API_KEY_HERE]", consumerSecret: "[YOUR_API_SECRET_HERE]", redirectURL: NSURL(string: "[YOUR_REDIRECT_URL_HERE]")!, accessLevel: .Delete)
         return true
     }
 
