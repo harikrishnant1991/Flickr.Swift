@@ -31,8 +31,8 @@ This will initialise the Flickr Session with your Consumer Key, Consumer Secret 
 The user authentication can be verified using this call to determine if an active and valid session already exists before starting a new authentication flow.
 
 ```swift
-JHFlickr.Session.checkFlickrStatus(onCompletion: { (status) -> Void in
-})
+JHFlickr.Session.oAuth.verifyAccessToken { (status) -> Void in
+}
 ```
 
 The status in the above call shows if the flickr already has an active session or not. It is advisable to always check for an active session before starting a new authentication flow since the OAuth flow can be pretty heavy and time consuming. If there is no active session, use the following code to start with Flickr's OAuth flow and implement the `JHFlickrAuthenticationDelegate` in your `ViewController` as shown below to get the OAuth response.
@@ -40,12 +40,12 @@ The status in the above call shows if the flickr already has an active session o
 ```swift
 override func viewDidLoad() {
     super.viewDidLoad()
-    JHFlickr.Session.checkFlickrStatus(onCompletion: { (status) -> Void in
+    JHFlickr.Session.oAuth.verifyAccessToken { (status) -> Void in
         if !status {
-            JHFlickr.Session.oAuthDelegate = self
+            JHFlickr.Session.oAuth.oAuthDelegate = self
             JHFlickr.Session.startAuthentication()
         }
-    })
+    }
 }
     
 func authenticationComplete() {

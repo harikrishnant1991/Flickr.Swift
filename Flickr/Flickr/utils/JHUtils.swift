@@ -24,8 +24,17 @@ extension String {
 }
 
 class JHUtils: NSObject {
-    
+     /**
+     The base URL for all Flickr API calls.
+     */
     static let FLICKR_BASE_URL = "https://api.flickr.com/services/rest"
+    
+    // MARK: User Defaults and Keys
+    private static let defaults = NSUserDefaults.standardUserDefaults()
+    
+    private static let ACCESS_TOKEN_DEFAULTS_KEY = "ACCESS_TOKEN_DEFAULTS_KEY"
+    private static let ACCESS_SECRET_DEFAULTS_KEY = "ACCESS_SECRET_DEFAULTS_KEY"
+    private static let USER_NSID_DEFAULTS_KEY = "USER_NSID_DEFAULTS_KEY"
     
     /**
      The consumer key obtained from Flickr developer console.
@@ -92,5 +101,44 @@ class JHUtils: NSObject {
             randomString.append(letters[index])
         }
         return randomString
+    }
+    
+    /**
+     The access token obtained after the OAuth is complete. This is stored and accessed from NSUserDefaults.
+     */
+    static var accessToken : String! {
+        get {
+            return defaults.stringForKey(ACCESS_TOKEN_DEFAULTS_KEY)
+        }
+        set {
+            defaults.setObject(newValue, forKey: ACCESS_TOKEN_DEFAULTS_KEY)
+            defaults.synchronize()
+        }
+    }
+    
+    /**
+     The access token secret obtained after the OAuth is complete. This is stored and accessed from NSUserDefaults.
+     */
+    static var accessSecret : String! {
+        get {
+            return defaults.stringForKey(ACCESS_SECRET_DEFAULTS_KEY)
+        }
+        set {
+            defaults.setObject(newValue, forKey: ACCESS_SECRET_DEFAULTS_KEY)
+            defaults.synchronize()
+        }
+    }
+    
+    /**
+     The user NSID obtained after the OAuth is complete. This is stored and accessed from NSUserDefaults.
+     */
+    static var userNSID : String! {
+        get {
+            return defaults.stringForKey(USER_NSID_DEFAULTS_KEY)
+        }
+        set {
+            defaults.setObject(newValue, forKey: USER_NSID_DEFAULTS_KEY)
+            defaults.synchronize()
+        }
     }
 }

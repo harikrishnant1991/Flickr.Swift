@@ -13,12 +13,12 @@ class ViewController: UIViewController, JHFlickrAuthenticationDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        JHFlickr.Session.checkFlickrStatus(onCompletion: { (status) -> Void in
+        JHFlickr.Session.oAuth.verifyAccessToken { (status) -> Void in
             if !status {
-                JHFlickr.Session.oAuthDelegate = self
+                JHFlickr.Session.oAuth.oAuthDelegate = self
                 JHFlickr.Session.startAuthentication()
             }
-        })
+        }
     }
 
     override func didReceiveMemoryWarning() {

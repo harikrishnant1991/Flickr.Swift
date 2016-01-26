@@ -43,7 +43,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(app: UIApplication, openURL url: NSURL, options: [String : AnyObject]) -> Bool {
-        return (JHFlickr.Session.oAuth?.userAuthenticated(url))!
+        return (JHFlickr.Session.oAuth.userAuthenticated(url))
     }
 }
 

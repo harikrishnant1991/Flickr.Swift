@@ -9,6 +9,20 @@
 import UIKit
 import SafariServices
 
+protocol JHFlickrAuthenticationDelegate {
+    /**
+     The user authentication has completed successfully.
+     */
+    func authenticationComplete()
+    
+    /**
+     The user authentication has failed.
+     
+     - parameter error: The error message due to which the authentication failed.
+     */
+    func authenticationFailed(error : String)
+}
+
 enum AccessLevel : String {
     /**
      Read only permission. Can only be used to fetch data.
@@ -33,6 +47,13 @@ class JHFlickrOAuth: NSObject {
     
     private let OAUTH_ERROR_MESSAGE = "An error occured while communicating with server. Please try again later."
     
+    // MARK: Public Properties
+    
+    /**
+    Delegate for handling OAuth flow of Flickr.
+    */
+    var oAuthDelegate : JHFlickrAuthenticationDelegate?
+    
     // MARK: Public methods
     
     /**
@@ -43,10 +64,8 @@ class JHFlickrOAuth: NSObject {
     
     - parameter redirectURL: The URL to which the webview need to be redirected after the OAuth flow.
     - parameter accessLevel: The access level for API calls.
-    - parameter completionHandler: The completion handler for OAuth.
      */
-    func initializeOAuth(redirectURL redirectURL : String, accessLevel : AccessLevel, completionHandler: (status : Bool, accessToken : String?, accessSecret : String?, userNSID : String?, error : String?) -> Void) {
-        self.completionHandler = completionHandler
+    func initializeOAuth(redirectURL redirectURL : String, accessLevel : AccessLevel) {
         self.redirectURL = redirectURL
         self.accessLevel = accessLevel
         fetchRequestToken()
@@ -76,17 +95,19 @@ class JHFlickrOAuth: NSObject {
     /**
      Verify if the access token fetched is valid or not.
      
-     - parameter accessToken: The access token to be validated.
-     - parameter accessSecret: The access secret for validating the access token.
      - parameter completionHandler: The event closure that need to be called on completion of the verification call.
      */
-    func verifyAccessToken(accessToken : String, accessSecret : String, completionHandler: (status : Bool) -> Void) {
+    func verifyAccessToken(completionHandler: (status : Bool) -> Void) {
+        if JHUtils.accessToken == nil || JHUtils.accessToken == "" || JHUtils.accessSecret == nil || JHUtils.accessSecret == "" || JHUtils.userNSID == nil || JHUtils.userNSID == "" {
+            completionHandler(status: false)
+            return
+        }
         var requestUrl = JHUtils.FLICKR_BASE_URL + "?"
-        let paramDictionary = verifyAccessTokenParams(accessToken)
+        let paramDictionary = verifyAccessTokenParams()
         for (key, value) in paramDictionary {
             requestUrl = requestUrl + key + "=" + value + "&"
         }
-        requestUrl = requestUrl + "oauth_signature=" + JHUtils.GetSignature(url: JHUtils.FLICKR_BASE_URL, params: paramDictionary, key: JHUtils.CONSUMER_SECRET + "&" + accessSecret)
+        requestUrl = requestUrl + "oauth_signature=" + JHUtils.GetSignature(url: JHUtils.FLICKR_BASE_URL, params: paramDictionary, key: JHUtils.CONSUMER_SECRET + "&" + JHUtils.accessSecret)
         let session = NSURLSession.sharedSession()
         session.dataTaskWithURL(NSURL(string: requestUrl)!) { (data, response, error) -> Void in
             if (error == nil) {
@@ -107,17 +128,6 @@ class JHFlickrOAuth: NSObject {
     }
     
     // MARK: Private properties
-    
-    /**
-    Completion handler for OAuth.
-    
-    - parameter status: If the OAuth was success or not.
-    - parameter accessToken: The access token fetched in case of a successful OAuth.
-    - parameter accessSecret: The access token secret fetched in case of a successful OAuth.
-    - parameter userNSID: The user NSID fetched in case of a successful OAuth.
-    - parameter username: The user's name fetched in case of a successful OAuth.
-    */
-    private var completionHandler : ((status : Bool, accessToken : String?, accessSecret : String?, userNSID : String?, error : String?) -> Void)!
     
     /**
      The redirect URL set when the app is created in the Flickr developer console.
@@ -172,11 +182,11 @@ class JHFlickrOAuth: NSObject {
                     self.getUserAuthorisation()
                 }
                 else {
-                    self.completionHandler(status: false, accessToken: nil, accessSecret: nil, userNSID: nil, error: self.OAUTH_ERROR_MESSAGE)
+                    self.oAuthDelegate?.authenticationFailed(self.OAUTH_ERROR_MESSAGE)
                 }
             }
             else {
-                self.completionHandler(status: false, accessToken: nil, accessSecret: nil, userNSID: nil, error: error?.localizedDescription)
+                self.oAuthDelegate?.authenticationFailed((error?.localizedDescription)!)
             }
             }.resume()
     }
@@ -205,17 +215,17 @@ class JHFlickrOAuth: NSObject {
                 let result = String(data: data!, encoding: NSUTF8StringEncoding)
                 let parts = result?.componentsSeparatedByString("&")
                 if parts?.count == 5 {
-                    let accessToken = parts![1].stringByReplacingOccurrencesOfString("oauth_token=", withString: "")
-                    let accessSecret = parts![2].stringByReplacingOccurrencesOfString("oauth_token_secret=", withString: "")
-                    let userNSID = parts![3].stringByReplacingOccurrencesOfString("user_nsid=", withString: "")
-                    self.completionHandler(status: true, accessToken: accessToken, accessSecret: accessSecret, userNSID: userNSID, error: nil)
+                    JHUtils.accessToken = parts![1].stringByReplacingOccurrencesOfString("oauth_token=", withString: "")
+                    JHUtils.accessSecret = parts![2].stringByReplacingOccurrencesOfString("oauth_token_secret=", withString: "")
+                    JHUtils.userNSID = parts![3].stringByReplacingOccurrencesOfString("user_nsid=", withString: "")
+                    self.oAuthDelegate?.authenticationComplete()
                 }
                 else {
-                    self.completionHandler(status: false, accessToken: nil, accessSecret: nil, userNSID: nil, error: self.OAUTH_ERROR_MESSAGE)
+                    self.oAuthDelegate?.authenticationFailed(self.OAUTH_ERROR_MESSAGE)
                 }
             }
             else {
-                self.completionHandler(status: false, accessToken: nil, accessSecret: nil, userNSID: nil, error: error?.localizedDescription)
+                self.oAuthDelegate?.authenticationFailed((error?.localizedDescription)!)
             }
             }.resume()
     }
@@ -263,7 +273,7 @@ class JHFlickrOAuth: NSObject {
     /**
      The parameters to be passed along with the verification request.
      */
-    private func verifyAccessTokenParams(accessToken : String) -> Dictionary<String, String> {
+    private func verifyAccessTokenParams() -> Dictionary<String, String> {
         var paramsDictionary = Dictionary<String, String>()
         paramsDictionary["oauth_nonce"] = JHUtils.RandomStringWithLength(14)
         paramsDictionary["oauth_timestamp"] = JHUtils.TimeStamp
@@ -273,7 +283,7 @@ class JHFlickrOAuth: NSObject {
         paramsDictionary["nojsoncallback"] = "1"
         paramsDictionary["format"] = "json"
         paramsDictionary["method"] = "flickr.test.login"
-        paramsDictionary["oauth_token"] = accessToken
+        paramsDictionary["oauth_token"] = JHUtils.accessToken
         return paramsDictionary;
     }
 }

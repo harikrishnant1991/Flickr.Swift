@@ -8,28 +8,7 @@
 
 import UIKit
 
-protocol JHFlickrAuthenticationDelegate {
-    /**
-     The user authentication has completed successfully.
-     */
-    func authenticationComplete()
-    
-    /**
-     The user authentication has failed.
-     
-     - parameter error: The error message due to which the authentication failed.
-     */
-    func authenticationFailed(error : String)
-}
-
 class JHFlickr: NSObject {
-    
-    // MARK: User Defaults and Keys
-    private let defaults = NSUserDefaults.standardUserDefaults()
-    
-    private let ACCESS_TOKEN_DEFAULTS_KEY = "ACCESS_TOKEN_DEFAULTS_KEY"
-    private let ACCESS_SECRET_DEFAULTS_KEY = "ACCESS_SECRET_DEFAULTS_KEY"
-    private let USER_NSID_DEFAULTS_KEY = "USER_NSID_DEFAULTS_KEY"
     
     private override init() {
         super.init()
@@ -44,14 +23,9 @@ class JHFlickr: NSObject {
     // MARK: Public Properties
     
     /**
-    Delegate for handling OAuth flow of Flickr.
-    */
-    var oAuthDelegate : JHFlickrAuthenticationDelegate?
-    
-    /**
      The instance of JHFlickrOAuth that handles the OAuth flow of JHFlickr library.
      */
-    var oAuth : JHFlickrOAuth?
+    var oAuth = JHFlickrOAuth()
     
     // MARK: Public methods
     /**
@@ -70,51 +44,20 @@ class JHFlickr: NSObject {
     }
     
     /**
-     Check if JHFlickr has an active session with a valid access token.
-     
-     - parameter completionHandler: The completion handler for the verification call. Passes a boolean parameter to show the accesstoken status.
-     */
-    func checkFlickrStatus(onCompletion completionHandler: (status : Bool) -> Void) {
-        if accessToken == nil || accessToken == "" || accessSecret == nil || accessSecret == "" || userNSID == nil || userNSID == "" {
-            completionHandler(status: true)
-            return
-        }
-        oAuth = JHFlickrOAuth()
-        oAuth?.verifyAccessToken(accessToken, accessSecret: accessSecret, completionHandler: { (status) -> Void in
-            completionHandler(status: status)
-        })
-    }
-    
-    /**
      Start the OAuth flow of flickr.
      
      It is adivasble always to check for active sessions before starting a new OAuth flow as shown below:
      ```
-     JHFlickr.Session.checkFlickrStatus(onCompletion: { (status) -> Void in
+     JHFlickr.Session.oAuth.verifyAccessToken { (status) -> Void in
         if !status {
-            JHFlickr.Session.oAuthDelegate = self
+            JHFlickr.Session.oAuth.oAuthDelegate = self
             JHFlickr.Session.startAuthentication()
         }
-     })
+     }
      ```
      */
     func startAuthentication() {
-        if oAuth == nil {
-            oAuth = JHFlickrOAuth()
-        }
-        oAuth?.initializeOAuth(redirectURL: redirectURL.absoluteString, accessLevel: accessLevel, completionHandler: { (status, accessToken, accessSecret, userNSID, error) -> Void in
-            //Completion handler of Flickr OAuth
-            if status {
-                self.accessToken = accessToken
-                self.accessSecret = accessSecret
-                self.userNSID = userNSID
-                self.oAuthDelegate?.authenticationComplete()
-            }
-            else {
-                self.oAuthDelegate?.authenticationFailed(error!)
-            }
-            self.oAuth = nil
-        })
+        oAuth.initializeOAuth(redirectURL: redirectURL.absoluteString, accessLevel: accessLevel)
     }
     
     // MARK: Private Properties
@@ -128,45 +71,6 @@ class JHFlickr: NSObject {
      The access level required for the application.
      */
     private var accessLevel : AccessLevel!
-    
-    /**
-     The access token obtained after the OAuth is complete. This is stored and accessed from NSUserDefaults.
-     */
-    private var accessToken : String! {
-        get {
-            return defaults.stringForKey(ACCESS_TOKEN_DEFAULTS_KEY)
-        }
-        set {
-            defaults.setObject(newValue, forKey: ACCESS_TOKEN_DEFAULTS_KEY)
-            defaults.synchronize()
-        }
-    }
-    
-    /**
-     The access token secret obtained after the OAuth is complete. This is stored and accessed from NSUserDefaults.
-     */
-    private var accessSecret : String! {
-        get {
-            return defaults.stringForKey(ACCESS_SECRET_DEFAULTS_KEY)
-        }
-        set {
-            defaults.setObject(newValue, forKey: ACCESS_SECRET_DEFAULTS_KEY)
-            defaults.synchronize()
-        }
-    }
-    
-    /**
-     The user NSID obtained after the OAuth is complete. This is stored and accessed from NSUserDefaults.
-     */
-    private var userNSID : String! {
-        get {
-            return defaults.stringForKey(USER_NSID_DEFAULTS_KEY)
-        }
-        set {
-            defaults.setObject(newValue, forKey: USER_NSID_DEFAULTS_KEY)
-            defaults.synchronize()
-        }
-    }
     
     // MARK: Private Methods
 }
